@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
-import simpleReducer from './reducers/TestReducer';
+import chartData from "./reducers/ChartDataReducer";
 
 export default combineReducers({
-    simpleReducer
+    chartData
 });
+
