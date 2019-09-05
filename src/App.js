@@ -1,26 +1,20 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import logo from './logo.svg';
-import './App.scss';
-import TestComponent from "./components/TestComponent"
+import {InputPanel} from "./components/input-form/InputForm";
+import {Chart} from "./components/chart/Chart";
+import {SideBar} from "./components/sidebar/SideBar";
+import {Box} from "@material-ui/core";
 
-class App extends Component {
-
-  render() {
+export const App = () => {
     return (
-        <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <h1 className="App-title">Welcome to React</h1>
-          </header>
-          <p className="App-intro">
-            To get started, edit <code>src/App.js</code> and save to reload
-          </p>
-          <TestComponent/>
-        </div>
+        <Box display="flex" flexDirection="row" alignItems="flex-start" justifyContent="stretch">
+            <SideBar flex="0 0 auto"/>
+            <Chart flex="1 1 auto"/>
+            <InputPanel flex="0 0 auto"/>
+        </Box>
     );
-  }
-}
+};
+
 
 const mapStateToProps = state => ({
   ...state
