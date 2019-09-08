@@ -1,13 +1,14 @@
 import React from 'react';
-import './SideBar.scss';
+import componentStyle from "./SideBar.style";
 import Divider from '@material-ui/core/Divider';
 import {Box} from "@material-ui/core";
 
 export const SideBar = ({ flex }) => {
+    const classes = componentStyle();
     return (
-        <Box variant="permanent" className="sidebar-drawer" flex={flex}>
-            <div className="sidebar-logo">
-                <img src="./assets/logo_2.PNG" alt="Trade Trainer"/>
+        <Box className={classes.sidebarDrawer} flex={flex} >
+            <div className={classes.sidebarLogo}>
+                <img src="./assets/logo_3.PNG" alt="Trade Trainer"/>
             </div>
             <Divider/>
         </Box>
