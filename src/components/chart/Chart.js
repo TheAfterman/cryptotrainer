@@ -8,6 +8,8 @@ import { Box, Paper } from '@material-ui/core';
 
 class Chart extends Component {
     chart;
+    candlestickSeries;
+    lastIndex = 0;
 
     initChart() {
         this.chart = createChart('ChartTarget', {
@@ -33,9 +35,22 @@ class Chart extends Component {
     }
 
     addChartData(data) {
-        const candlestickSeries = this.chart.addCandlestickSeries();
-        candlestickSeries.setData(data);
+        this.candlestickSeries = this.chart.addCandlestickSeries();
+        this.candlestickSeries.setData(data);
         this.updateChartDimensions();
+    }
+
+    playChart(data) {
+        let i = this.lastIndex || 0;
+        const id = setInterval(() => {
+            if (this.props.isRunning && data[i]) {
+                this.candlestickSeries.update(data[i]);
+                i++;
+            } else {
+                clearInterval(id);
+                this.lastIndex = i;
+            }
+        },500);
     }
 
     updateChartDimensions() {
@@ -46,12 +61,15 @@ class Chart extends Component {
 
     componentDidMount() {
         this.initChart();
-        this.props.getData();
+        this.props.getData('BTC', 'USD', new Date(2019, 6, 5));
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.data !== this.props.data) {
             this.addChartData(this.props.data);
+        }
+        if (prevProps.playData !== this.props.playData) {
+            this.playChart(this.props.playData);
         }
     }
 
@@ -60,7 +78,7 @@ class Chart extends Component {
     }
 
     render() {
-
+ 
         return (
             <Box flex={this.props.flex} >
                 <Paper id="ChartTarget" className={this.props.classes.chartContainer} >
@@ -72,10 +90,12 @@ class Chart extends Component {
 }
 
 const mapStateToProps = state => ({
-    data: state.chartData.data
+    data: state.chartData.data,
+    playData: state.tradeData.data,
+    isRunning: state.tradeData.isRunning
 });
 const mapDispatchToProps = dispatch => ({
-    getData: () => dispatch(getData())
+    getData: (symbol, ins, endDate, aggregate) => dispatch(getData(symbol, ins, endDate, aggregate))
 });
 
 export default withStyles(componentStyle)(connect(mapStateToProps, mapDispatchToProps)(Chart));

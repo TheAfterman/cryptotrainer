@@ -3,6 +3,10 @@ export default (state = {}, action) => {
         case 'GET_DATA_REQUEST':
             return {
                 ...state,
+                symbol: action.payload.symbol,
+                instrument: action.payload.ins,
+                endDate: action.payload.endDate,
+                aggregate: action.payload.aggregate,
                 loading: true
             };
         case 'GET_DATA_SUCCESS':

@@ -1,0 +1,38 @@
+import {apiKey, baseUrl} from '../data/apiConstants';
+
+export const startTrade = () => (dispatch, getState) => {
+    dispatch({
+        type: 'EXECUTE_TRADE'
+    });
+
+    const tradeParams = getState().chartData;
+
+    // calculate the correct timestamp to get the next 50 candles
+    const endDate = (tradeParams.endDate.getTime()/1000) + (51 * tradeParams.aggregate * 60 * 60);
+
+    return fetch(`${baseUrl}histohour?fsym=${tradeParams.symbol}&tsym=${tradeParams.instrument}&limit=50&toTs=${endDate}&aggregate=${tradeParams.aggregate}&api_key=${apiKey}`).then(
+        (response) => {
+            return response.json().then(
+                (data) => {
+                    if (response.ok) {
+                        dispatch({
+                            type: 'EXECUTE_TRADE_SUCCESS',
+                            payload: data
+                        })
+                    } else {
+                        dispatch({
+                            type: 'EXECUTE_TRADE_FAILURE',
+                            payload: data
+                        })
+                    }
+                }
+            )
+        }
+    )       
+}
+
+export const pauseTrade = () => (dispatch) => {
+    dispatch({
+        type: 'EXECUTE_TRADE_PAUSE'
+    });
+}

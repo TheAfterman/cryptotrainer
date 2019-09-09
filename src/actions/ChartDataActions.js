@@ -1,13 +1,17 @@
-const apiKey = '3890d86ed97a82753eb2c4eb17ab33553069654b37632a9aa6cc0009c8348ed5';
-const baseUrl = 'https://min-api.cryptocompare.com/data/';
-const getHistoryUrl = baseUrl + 'histohour?fsym=BTC&tsym=USD&limit=180&aggregate=4';
+import {apiKey, baseUrl} from '../data/apiConstants';
 
-export const getData = () => (dispatch => {
+export const getData = (symbol, ins = 'USD', endDate, aggregate = 4) => (dispatch => {
     dispatch({
         type: 'GET_DATA_REQUEST',
+        payload: {
+            symbol,
+            endDate,
+            ins,
+            aggregate
+        }
     });
 
-    return fetch(`${getHistoryUrl}&api_key=${apiKey}`).then(
+    return fetch(`${baseUrl}histohour?fsym=${symbol}&tsym=${ins}&limit=180&toTs=${endDate.getTime()/1000}&aggregate=${aggregate}&api_key=${apiKey}`).then(
         (response) => {
             return response.json().then(
                 (data) => {
