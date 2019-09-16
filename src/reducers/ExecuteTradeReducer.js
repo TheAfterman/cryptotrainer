@@ -15,6 +15,11 @@ export default (state = {}, action) => {
                 ...state,
                 isRunning: false
             };
+        case 'EXECUTE_TRADE_CLOSE':
+            return {
+                ...state,
+                isRunning: false
+            };
         case 'EXECUTE_TRADE_COMPLETE':
             return {
                 ...state,

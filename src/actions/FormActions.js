@@ -37,6 +37,16 @@ export const pauseTrade = () => (dispatch) => {
     });
 }
 
+export const closeTrade = (entry, close) => (dispatch) => {
+    dispatch({
+        type: 'EXECUTE_TRADE_CLOSE',
+        payload: {
+            entry,
+            close
+        }
+    });
+}
+
 export const entryPriceChange = (price) => (dispatch) => {
     dispatch({
         type: 'ENTRY_PRICE_CHANGE',

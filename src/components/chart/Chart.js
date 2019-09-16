@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/styles';
 import componentStyle from "./Chart.style";
 import { Box, Paper } from '@material-ui/core';
-import { pauseTrade } from '../../actions/FormActions';
+import { pauseTrade, closeTrade } from '../../actions/FormActions';
 
 class Chart extends Component {
     chart;
@@ -62,9 +62,9 @@ class Chart extends Component {
         if (!this.tradeEntered && candleData.low <= this.props.entry) {
             this.enterTrade(this.props.entry);
         } else if (this.tradeEntered && candleData.low <= this.props.stop) {
-            this.closeTrade(this.props.stop);
+            this.closeTrade(this.props.entry, this.props.stop);
         } else if (this.tradeEntered && candleData.high >= this.props.target) {
-            this.closeTrade(this.props.target);
+            this.closeTrade(this.props.entry, this.props.target);
         }
     }
 
@@ -72,9 +72,10 @@ class Chart extends Component {
         this.tradeEntered = true;
     }
 
-    closeTrade(price) {
-        this.props.pauseTrade();
+    closeTrade(entry, price) {
+        this.props.closeTrade(entry, price);
         this.tradeEntered = false;
+        
     }
 
     updateChartDimensions() {
@@ -87,7 +88,8 @@ class Chart extends Component {
         if (!this.entryLine) {
             this.entryLine = this.chart.addLineSeries({
                 priceLineWidth: 1,
-                priceLineStyle: LineStyle.Solid
+                priceLineStyle: LineStyle.Solid,
+                title: 'Entry'
             });
         }
 
@@ -102,7 +104,8 @@ class Chart extends Component {
             this.stopLine = this.chart.addLineSeries({
                 priceLineColor: '#FF0000',
                 priceLineWidth: 1,
-                priceLineStyle: LineStyle.Solid
+                priceLineStyle: LineStyle.Solid,
+                title: 'Stop'
             })
         }
 
@@ -117,7 +120,8 @@ class Chart extends Component {
             this.targetLine = this.chart.addLineSeries({
                 priceLineColor: '#00FF00',
                 priceLineWidth: 1,
-                priceLineStyle: LineStyle.Solid
+                priceLineStyle: LineStyle.Solid,
+                title: 'Target'
             })
         }
 
@@ -176,7 +180,8 @@ const mapStateToProps = state => ({
 });
 const mapDispatchToProps = dispatch => ({
     getData: (symbol, ins, endDate, aggregate) => dispatch(getData(symbol, ins, endDate, aggregate)),
-    pauseTrade: () => dispatch(pauseTrade())
+    pauseTrade: () => dispatch(pauseTrade()),
+    closeTrade: (entry, price) => dispatch(closeTrade(entry, price))
 });
 
 export default withStyles(componentStyle)(connect(mapStateToProps, mapDispatchToProps)(Chart));
