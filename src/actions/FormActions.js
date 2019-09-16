@@ -36,3 +36,30 @@ export const pauseTrade = () => (dispatch) => {
         type: 'EXECUTE_TRADE_PAUSE'
     });
 }
+
+export const entryPriceChange = (price) => (dispatch) => {
+    dispatch({
+        type: 'ENTRY_PRICE_CHANGE',
+        payload: {
+            price
+        }
+    })
+}
+
+export const stopPriceChange = (price) => (dispatch) => {
+    dispatch({
+        type: 'STOP_PRICE_CHANGE',
+        payload: {
+            price
+        }
+    })
+}
+
+export const targetPriceChange = (price) => (dispatch) => {
+    dispatch({
+        type: 'TARGET_PRICE_CHANGE',
+        payload: {
+            price
+        }
+    })
+}

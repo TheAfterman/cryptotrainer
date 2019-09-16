@@ -9,13 +9,18 @@ import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux'
-import {startTrade, pauseTrade} from '../../actions/FormActions';
+import {startTrade, pauseTrade, entryPriceChange, stopPriceChange, targetPriceChange} from '../../actions/FormActions';
 
 export const InputPanel = ({ flex }) => {
 
     const classes = componentStyle();
     const dispatch = useDispatch();
     const isRunning = useSelector(state => state.tradeData.isRunning);
+    const tradeInputs = useSelector(state => {
+        return (({entry, stop, target}) => {
+            return {entry, stop, target};
+        })(state.tradeData);
+    });
 
     const dispatchTradeAction = () => {
         if (isRunning) {
@@ -25,15 +30,41 @@ export const InputPanel = ({ flex }) => {
         }
     }
 
+    const getTradeR = (inputs) => {
+        if (inputs.entry && inputs.stop && inputs.target) {
+            return calculateR(inputs);
+        } else {
+            return '';
+        }
+    }
+
+    const calculateR = (inputs) => {
+        return ((inputs.target - inputs.entry) / (inputs.entry - inputs.stop)).toFixed(2);
+    }
+
+    const getStopPercent = (inputs) => {
+        if (inputs.entry && inputs.stop) {
+            return (100 * (inputs.entry - inputs.stop) / inputs.entry).toFixed(2);
+        } else {
+            return '';
+        }
+    }
+
+    const getTargetPercent = (inputs) => {
+        if (inputs.entry && inputs.target) {
+            return (100 * (inputs.target - inputs.entry) / inputs.entry).toFixed(2);
+        } else {
+            return '';
+        }
+    }
+
     return (
         <Box display="flex" flexDirection="column">
             <Box display="flex" flexDirection="row" flex={flex}>
                 <Box component="form" flex="1 1 auto" display="flex" flexDirection="column" className={classes.inputForm}>
-                    <AppInput label="Entry Price" />
-                    <AppInput label="Stop Loss" />
-                    <AppInput label="Target 1" />
-                    <AppInput label="Target 2" />
-                    <AppInput label="Target 3" />
+                    <AppInput label="Entry Price" changeAction={entryPriceChange} />
+                    <AppInput label="Stop Loss" changeAction={stopPriceChange} />
+                    <AppInput label="Target" changeAction={targetPriceChange} />
                     <Box display="flex" flexDirection="row" className={classes.buttonRow}>
                         <Button variant="contained" color="primary" onClick={dispatchTradeAction} >
                             {isRunning ? 'Pause Trade' : 'Execute Trade'}
@@ -43,11 +74,9 @@ export const InputPanel = ({ flex }) => {
 
                 </Box>
                 <Paper className={classes.statBox}>
-                    <StatRow label="R: " value="2.1"/>
-                    <StatRow label="Stop %: " value="5%"/>
-                    <StatRow label="Target 1 %: " value="10%"/>
-                    <StatRow label="Target 2 %: " value="15%"/>
-                    <StatRow label="Target 3 %: " value="21%"/>
+                    <StatRow label="R: " value={getTradeR(tradeInputs)}/>
+                    <StatRow label="Stop %: " value={getStopPercent(tradeInputs)}/>
+                    <StatRow label="Target %: " value={getTargetPercent(tradeInputs)}/>
                 </Paper>
             </Box>
             <Divider className={classes.divider}></Divider>

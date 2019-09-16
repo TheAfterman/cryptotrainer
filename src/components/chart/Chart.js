@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
-import {createChart, CrosshairMode} from "lightweight-charts";
+import {createChart, CrosshairMode, LineStyle} from "lightweight-charts";
 import {getData} from "../../actions/ChartDataActions";
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/styles';
 import componentStyle from "./Chart.style";
 import { Box, Paper } from '@material-ui/core';
+import { pauseTrade } from '../../actions/FormActions';
 
 class Chart extends Component {
     chart;
     candlestickSeries;
+    entryLine;
+    stopLine;
+    targetLine;
     lastIndex = 0;
 
     initChart() {
@@ -45,6 +49,7 @@ class Chart extends Component {
         const id = setInterval(() => {
             if (this.props.isRunning && data[i]) {
                 this.candlestickSeries.update(data[i]);
+                this.checkTradeConditions(data[i]);
                 i++;
             } else {
                 clearInterval(id);
@@ -53,10 +58,73 @@ class Chart extends Component {
         },500);
     }
 
+    checkTradeConditions(candleData) {
+        if (!this.tradeEntered && candleData.low <= this.props.entry) {
+            this.enterTrade(this.props.entry);
+        } else if (this.tradeEntered && candleData.low <= this.props.stop) {
+            this.closeTrade(this.props.stop);
+        } else if (this.tradeEntered && candleData.high >= this.props.target) {
+            this.closeTrade(this.props.target);
+        }
+    }
+
+    enterTrade(price) {
+        this.tradeEntered = true;
+    }
+
+    closeTrade(price) {
+        this.props.pauseTrade();
+        this.tradeEntered = false;
+    }
+
     updateChartDimensions() {
         let width = document.getElementById('ChartTarget').offsetWidth;
         this.chart.resize(500, width);
         
+    }
+
+    addEntryLine(price) {
+        if (!this.entryLine) {
+            this.entryLine = this.chart.addLineSeries({
+                priceLineWidth: 1,
+                priceLineStyle: LineStyle.Solid
+            });
+        }
+
+        this.entryLine.setData([
+            { time: this.props.data[0].time, value: price },
+            { time: this.props.data[this.props.data.length - 1].time, value: price }
+        ]);
+    }
+
+    addStopLine(price) {
+        if (!this.stopLine) {
+            this.stopLine = this.chart.addLineSeries({
+                priceLineColor: '#FF0000',
+                priceLineWidth: 1,
+                priceLineStyle: LineStyle.Solid
+            })
+        }
+
+        this.stopLine.setData([
+            { time: this.props.data[0].time, value: price },
+            { time: this.props.data[this.props.data.length - 1].time, value: price }
+        ]);
+    }
+
+    addTargetLine(price) {
+        if (!this.targetLine) {
+            this.targetLine = this.chart.addLineSeries({
+                priceLineColor: '#00FF00',
+                priceLineWidth: 1,
+                priceLineStyle: LineStyle.Solid
+            })
+        }
+
+        this.targetLine.setData([
+            { time: this.props.data[0].time, value: price },
+            { time: this.props.data[this.props.data.length - 1].time, value: price }
+        ]);
     }
 
     componentDidMount() {
@@ -70,6 +138,15 @@ class Chart extends Component {
         }
         if (prevProps.playData !== this.props.playData) {
             this.playChart(this.props.playData);
+        }
+        if (prevProps.entry !== this.props.entry) {
+            this.addEntryLine(this.props.entry);
+        }
+        if (prevProps.stop !== this.props.stop) {
+            this.addStopLine(this.props.stop);
+        }
+        if (prevProps.target !== this.props.target) {
+            this.addTargetLine(this.props.target);
         }
     }
 
@@ -92,10 +169,14 @@ class Chart extends Component {
 const mapStateToProps = state => ({
     data: state.chartData.data,
     playData: state.tradeData.data,
-    isRunning: state.tradeData.isRunning
+    isRunning: state.tradeData.isRunning,
+    entry: state.tradeData.entry,
+    stop: state.tradeData.stop,
+    target: state.tradeData.target
 });
 const mapDispatchToProps = dispatch => ({
-    getData: (symbol, ins, endDate, aggregate) => dispatch(getData(symbol, ins, endDate, aggregate))
+    getData: (symbol, ins, endDate, aggregate) => dispatch(getData(symbol, ins, endDate, aggregate)),
+    pauseTrade: () => dispatch(pauseTrade())
 });
 
 export default withStyles(componentStyle)(connect(mapStateToProps, mapDispatchToProps)(Chart));

@@ -14,12 +14,27 @@ export default (state = {}, action) => {
             return {
                 ...state,
                 isRunning: false
-            }
+            };
         case 'EXECUTE_TRADE_COMPLETE':
             return {
                 ...state,
                 isRunning: false
-            }
+            };
+        case 'ENTRY_PRICE_CHANGE':
+            return {
+                ...state,
+                entry: parseFloat(action.payload.price)
+            };
+        case 'STOP_PRICE_CHANGE':
+            return {
+                ...state,
+                stop: parseFloat(action.payload.price)
+            };
+        case 'TARGET_PRICE_CHANGE':
+            return {
+                ...state,
+                target: parseFloat(action.payload.price)
+            };
         default:
             return state;
     }
