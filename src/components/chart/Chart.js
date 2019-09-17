@@ -133,7 +133,7 @@ class Chart extends Component {
 
     componentDidMount() {
         this.initChart();
-        this.props.getData('BTC', 'USD', new Date(2019, 6, 5));
+        this.props.getData();
     }
 
     componentDidUpdate(prevProps) {

@@ -9,7 +9,7 @@ import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux'
-import {startTrade, pauseTrade, entryPriceChange, stopPriceChange, targetPriceChange} from '../../actions/FormActions';
+import {startTrade, pauseTrade, advanceChart, entryPriceChange, stopPriceChange, targetPriceChange} from '../../actions/FormActions';
 
 export const InputPanel = ({ flex }) => {
 
@@ -27,6 +27,14 @@ export const InputPanel = ({ flex }) => {
             dispatch(pauseTrade());
         } else {
             dispatch(startTrade());
+        }
+    }
+
+    const dispatchAdvanceAction = () => {
+        if (isRunning) {
+            dispatch(pauseTrade());
+        } else {
+            dispatch(advanceChart());
         }
     }
 
@@ -69,7 +77,7 @@ export const InputPanel = ({ flex }) => {
                         <Button variant="contained" color="primary" onClick={dispatchTradeAction} >
                             {isRunning ? 'Pause Trade' : 'Execute Trade'}
                         </Button>
-                        <Button>No Position</Button>
+                        <Button onClick={dispatchAdvanceAction}>Advance Chart</Button>
                     </Box>
 
                 </Box>
