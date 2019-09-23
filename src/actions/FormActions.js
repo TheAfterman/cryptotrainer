@@ -45,7 +45,11 @@ export const pauseTrade = () => (dispatch) => {
     });
 }
 
-export const closeTrade = (entry, close) => (dispatch) => {
+export const closeTrade = (entry, close) => (dispatch, getState) => {
+    if (!close) {
+        close = getState().chartData.currentPrice;
+    }
+
     dispatch({
         type: 'EXECUTE_TRADE_CLOSE',
         payload: {

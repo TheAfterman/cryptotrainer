@@ -1,5 +1,10 @@
 export default (state = {}, action) => {
     switch (action.type) {
+        case 'LAST_PRICE':
+            return {
+                ...state,
+                currentPrice: action.payload.price
+            }
         case 'GET_DATA_REQUEST':
             return {
                 ...state,

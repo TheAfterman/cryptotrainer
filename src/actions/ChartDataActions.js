@@ -1,6 +1,15 @@
 import {apiKey, baseUrl} from '../data/apiConstants';
 
-export const getData = (symbol, ins, endDate, aggregate) => ((dispatch, getState) => {
+export const lastPrice = price => dispatch => {
+    dispatch({
+        type: 'LAST_PRICE',
+        payload: {
+            price
+        }
+    });
+}
+
+export const getData = (symbol, ins, endDate, aggregate) => (dispatch, getState) => {
     if (!symbol) {
         symbol = getState().settingsData.symbols[0];
     }
@@ -30,9 +39,9 @@ export const getData = (symbol, ins, endDate, aggregate) => ((dispatch, getState
     });
 
     return requestData(symbol, ins, endDate, aggregate, dispatch, 'GET_DATA');
-});
+};
 
-export const getAdditionalData = (actionModifier) => ((dispatch, getState) => {
+export const getAdditionalData = (actionModifier) => (dispatch, getState) => {
     dispatch({
         type: 'GET_ADDITIONAL_DATA_REQUEST'
     });
@@ -41,7 +50,8 @@ export const getAdditionalData = (actionModifier) => ((dispatch, getState) => {
     // calculate the correct timestamp to get the next 100 candles
     const endDate = new Date(currentChart.endDate.getTime() + (181 * currentChart.aggregate * 60 * 60 * 1000));
     return requestData(currentChart.symbol, currentChart.instrument, endDate, currentChart.aggregate, dispatch, actionModifier);
-});
+};
+
 
 const requestData = (symbol, ins, endDate, aggregate, dispatch, actionModifier) => {
     const timeStamp = Math.floor(endDate.getTime()/1000);

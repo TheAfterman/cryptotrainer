@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {createChart, CrosshairMode, LineStyle} from "lightweight-charts";
-import {getData} from "../../actions/ChartDataActions";
+import {getData, lastPrice} from "../../actions/ChartDataActions";
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/styles';
 import componentStyle from "./Chart.style";
@@ -39,6 +39,12 @@ class Chart extends Component {
     }
 
     addChartData(data) {
+        // if we are starting a new chart, clear down the old data
+        if (this.candlestickSeries) {
+            this.chart.removeSeries(this.candlestickSeries);
+            this.lastIndex = 0;
+        }
+
         this.candlestickSeries = this.chart.addCandlestickSeries();
         this.candlestickSeries.setData(data);
         this.updateChartDimensions();
@@ -49,6 +55,7 @@ class Chart extends Component {
         const id = setInterval(() => {
             if (this.props.isRunning && data[i]) {
                 this.candlestickSeries.update(data[i]);
+                this.props.lastPrice(data[i].close);
                 this.checkTradeConditions(data[i]);
                 i++;
             } else {
@@ -181,7 +188,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     getData: (symbol, ins, endDate, aggregate) => dispatch(getData(symbol, ins, endDate, aggregate)),
     pauseTrade: () => dispatch(pauseTrade()),
-    closeTrade: (entry, price) => dispatch(closeTrade(entry, price))
+    closeTrade: (entry, price) => dispatch(closeTrade(entry, price)),
+    lastPrice: (price) => dispatch(lastPrice(price))
 });
 
 export default withStyles(componentStyle)(connect(mapStateToProps, mapDispatchToProps)(Chart));

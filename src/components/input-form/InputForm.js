@@ -9,7 +9,8 @@ import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux'
-import {startTrade, pauseTrade, advanceChart, entryPriceChange, stopPriceChange, targetPriceChange} from '../../actions/FormActions';
+import {startTrade, pauseTrade, entryPriceChange, stopPriceChange, targetPriceChange, closeTrade} from '../../actions/FormActions';
+import { getData } from '../../actions/ChartDataActions';
 
 export const InputPanel = ({ flex }) => {
 
@@ -30,12 +31,12 @@ export const InputPanel = ({ flex }) => {
         }
     }
 
-    const dispatchAdvanceAction = () => {
+    const dispatchNewChartAction = () => {
         if (isRunning) {
-            dispatch(pauseTrade());
-        } else {
-            dispatch(advanceChart());
+            dispatch(closeTrade(tradeInputs.entry));
         }
+
+        dispatch(getData());
     }
 
     const getTradeR = (inputs) => {
@@ -75,9 +76,9 @@ export const InputPanel = ({ flex }) => {
                     <AppInput label="Target" changeAction={targetPriceChange} />
                     <Box display="flex" flexDirection="row" className={classes.buttonRow}>
                         <Button variant="contained" color="primary" onClick={dispatchTradeAction} >
-                            {isRunning ? 'Pause Trade' : 'Execute Trade'}
+                            {isRunning ? 'Pause Chart' : 'Advance Chart'}
                         </Button>
-                        <Button onClick={dispatchAdvanceAction}>Advance Chart</Button>
+                        <Button onClick={dispatchNewChartAction}>New Chart</Button>
                     </Box>
 
                 </Box>
