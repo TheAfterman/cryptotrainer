@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/styles';
 import componentStyle from "./Chart.style";
 import { Box, Paper } from '@material-ui/core';
-import { pauseTrade, closeTrade } from '../../actions/FormActions';
+import { pauseTrade, closeTrade, startTrade } from '../../actions/FormActions';
 
 class Chart extends Component {
     chart;
@@ -58,6 +58,12 @@ class Chart extends Component {
                 this.props.lastPrice(data[i].close);
                 this.checkTradeConditions(data[i]);
                 i++;
+            } else if (this.props.isRunning && !data[i]) {
+                // get more data
+                this.lastIndex = 0;
+                this.props.pauseTrade();
+                this.props.startTrade();
+                clearInterval(id);
             } else {
                 clearInterval(id);
                 this.lastIndex = i;
@@ -188,6 +194,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     getData: (symbol, ins, endDate, aggregate) => dispatch(getData(symbol, ins, endDate, aggregate)),
     pauseTrade: () => dispatch(pauseTrade()),
+    startTrade: () => dispatch(startTrade()),
     closeTrade: (entry, price) => dispatch(closeTrade(entry, price)),
     lastPrice: (price) => dispatch(lastPrice(price))
 });
