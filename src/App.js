@@ -1,17 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {InputPanel} from "./components/input-form/InputForm";
-import Chart from "./components/chart/Chart";
-import {SideBar} from "./components/sidebar/SideBar";
-import {Box} from "@material-ui/core";
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { SignIn } from './components/sign-in/SignIn';
+import { Main } from './components/main/Main';
+import {config} from './Firebase';
+import firebase from 'firebase';
+
 
 export const App = () => {
+    if (!firebase.apps.length) {
+        firebase.initializeApp(config);
+    }
+
     return (
-        <Box display="flex" flexDirection="row" alignItems="flex-start" justifyContent="stretch">
-            <SideBar flex="0 0 auto"/>
-            <Chart flex="1 1 0"/>
-            <InputPanel flex="0 0 auto"/>
-        </Box>
+        <Router>
+            <Route path="/" exact component={SignIn} />
+            <Route path="/main" component={Main} />
+        </Router>
     );
 };
 
