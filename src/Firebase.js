@@ -23,17 +23,6 @@ export const uiConfig = {
     ]
 };
 
-export function verifyAuth(history) {
-    firebase.auth().onAuthStateChanged(function(user) {
-        if (user && history.location.pathname !== '/main') {
-            history.push('/main');
-            // ...
-        } else if (!user && history.location.pathname !== '/') {
-            history.push('/');
-        }
-    });
-}
-
 export function signOut(history) {
     firebase.auth().signOut().then(() => {
         window.location.pathname = '/';

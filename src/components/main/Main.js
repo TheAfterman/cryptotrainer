@@ -3,14 +3,9 @@ import { SideBar } from "../sidebar/SideBar";
 import Chart from "../chart/Chart";
 import { InputPanel } from "../input-form/InputForm";
 import {Box} from "@material-ui/core";
-import { withRouter } from 'react-router-dom';
-import { verifyAuth } from '../../Firebase';
+import {AuthHOC} from '../../hoc/AuthHOC';
 
-export const Main = withRouter(({ history }) => {
-
-    // verify user is logged in before loading
-    verifyAuth(history);
-
+export const Main = AuthHOC(() => {
     return (
         <Box display="flex" flexDirection="row" alignItems="flex-start" justifyContent="stretch">
             <SideBar flex="0 0 auto"/>

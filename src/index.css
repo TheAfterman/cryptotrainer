@@ -3,6 +3,6 @@ html, body, #root {
   margin: 0; 
 }
 
-#root > .MuiBox-root {
+#root > div,  #root > div > .MuiBox-root {
   height: 100%;
 }
