@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/styles';
 import componentStyle from "./Chart.style";
 import { Box, Paper } from '@material-ui/core';
 import { pauseTrade, closeTrade, startTrade } from '../../actions/FormActions';
+import { debounce } from '../../utils/Utils';
 
 class Chart extends Component {
     chart;
@@ -31,23 +32,13 @@ class Chart extends Component {
             }
         });
 
-        this.chart.subscribeVisibleTimeRangeChange(this.debounce(event => {
+        this.chart.subscribeVisibleTimeRangeChange(debounce(event => {
             if (event) {
                 this.isMoreHistoryNeeded();
             }
         }));
 
         window.addEventListener("resize", this.updateChartDimensions.bind(this));
-    }
-
-    debounce(func) { 
-        let debounceTimer 
-        return function() { 
-            const context = this;
-            const args = arguments; 
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => func.apply(context, args), 500);
-        } 
     }
 
     addChartData(data) {

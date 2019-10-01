@@ -1,4 +1,4 @@
-export default (state = { chartIntervals: ['4'], pairs: ['USD'], symbols: ['BTC'] }, action) => {
+export default (state = { chartIntervals: ['4'], pairs: ['USD'], symbols: ['BTC', 'ETH', 'LTC', 'XRP'] }, action) => {
     switch (action.type) {
         case 'SET_INTERVAL':
             return {

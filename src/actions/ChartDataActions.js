@@ -1,4 +1,5 @@
 import {apiKey, baseUrl} from '../data/apiConstants';
+import {getRandomArrayValue, getRandomInt} from '../utils/Utils';
 
 export const lastPrice = price => dispatch => {
     dispatch({
@@ -11,20 +12,20 @@ export const lastPrice = price => dispatch => {
 
 export const getData = (symbol, ins, endDate, aggregate) => (dispatch, getState) => {
     if (!symbol) {
-        symbol = getState().settingsData.symbols[0];
+        symbol = getRandomArrayValue(getState().settingsData.symbols);
     }
     if (!ins) {
-        ins = getState().settingsData.pairs[0];
+        ins = getRandomArrayValue(getState().settingsData.pairs);
     }
     if (!aggregate) {
-        aggregate = getState().settingsData.chartIntervals[0];
+        aggregate = getRandomArrayValue(getState().settingsData.chartIntervals);
     }
     if (!endDate) {
         // don't get data that's too new or we won't have any future data to play the chart with
         let end = new Date(Date.now() - 1000*60*60*24*90);
         // don't get data that's too old (e.g. before cryptos even existed)
-        let start = new Date(2015, 0, 1);
-        endDate = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+        let start = new Date(2016, 0, 1);
+        endDate = new Date(getRandomInt(start.getTime(), end.getTime()));
     }
 
 
