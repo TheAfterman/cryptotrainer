@@ -66,7 +66,7 @@ class Chart extends Component {
         const id = setInterval(() => {
             if (this.props.isRunning && data[i]) {
                 this.candlestickSeries.update(data[i]);
-                this.props.lastPrice(data[i].close);
+                this.props.lastPrice(data[i]);
                 this.checkTradeConditions(data[i]);
                 i++;
             } else if (this.props.isRunning && !data[i]) {

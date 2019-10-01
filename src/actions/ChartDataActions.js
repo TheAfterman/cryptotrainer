@@ -1,11 +1,11 @@
 import {apiKey, baseUrl} from '../data/apiConstants';
 import {getRandomArrayValue, getRandomInt} from '../utils/Utils';
 
-export const lastPrice = price => dispatch => {
+export const lastPrice = dataPoint => dispatch => {
     dispatch({
         type: 'LAST_PRICE',
         payload: {
-            price
+            dataPoint
         }
     });
 }

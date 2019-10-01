@@ -3,7 +3,8 @@ export default (state = {}, action) => {
         case 'LAST_PRICE':
             return {
                 ...state,
-                currentPrice: action.payload.price
+                currentPrice: action.payload.dataPoint.close,
+                data: state.data.concat(action.payload.dataPoint)
             }
         case 'GET_DATA_REQUEST':
             return {
