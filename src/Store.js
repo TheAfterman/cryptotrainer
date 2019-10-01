@@ -5,6 +5,7 @@ import rootReducer from './Reducer';
 const INIT_STATE = {
     chartData: {
         data: [],
+        historyData: [],
         loading: false,
         error: null
     }

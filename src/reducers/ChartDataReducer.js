@@ -26,6 +26,24 @@ export default (state = {}, action) => {
                 loading: false,
                 error: action.payload
             };
+        case 'GET_ADDITIONAL_HISTORY_REQUEST':
+            return {
+                ...state,
+                loading: true
+            };
+        case 'GET_ADDITIONAL_HISTORY_REQUEST_SUCCESS':
+            return {
+                ...state,
+                loading: false,
+                data: action.payload.Data.concat(state.data),
+                historyData: action.payload.Data
+            };
+        case 'GET_ADDITIONAL_HISTORY_REQUEST_FAILURE':
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
+            };
         default:
             return state
     }

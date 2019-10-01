@@ -52,6 +52,15 @@ export const getAdditionalData = (actionModifier) => (dispatch, getState) => {
     return requestData(currentChart.symbol, currentChart.instrument, endDate, currentChart.aggregate, dispatch, actionModifier);
 };
 
+export const getHistoryData = () => (dispatch, getState) => {
+    dispatch({
+        type: 'GET_ADDITIONAL_HISTORY_REQUEST'
+    });
+
+    const currentChart = getState().chartData;
+    return requestData(currentChart.symbol, currentChart.instrument, new Date(currentChart.data[0].time * 1000), currentChart.aggregate, dispatch, 'GET_ADDITIONAL_HISTORY_REQUEST');    
+}
+
 
 const requestData = (symbol, ins, endDate, aggregate, dispatch, actionModifier) => {
     const timeStamp = Math.floor(endDate.getTime()/1000);

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {createChart, CrosshairMode, LineStyle} from "lightweight-charts";
-import {getData, lastPrice} from "../../actions/ChartDataActions";
+import {getData, getHistoryData, lastPrice} from "../../actions/ChartDataActions";
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/styles';
 import componentStyle from "./Chart.style";
@@ -24,18 +24,30 @@ class Chart extends Component {
             },
             crosshair: {
                 mode: CrosshairMode.Normal
+            },
+            timeScale: {
+                rightBarStaysOnScroll: true,
+                visible: false
             }
         });
 
-        this.chart.subscribeClick((event) => {
-            const priceLine = this.chart.addLineSeries()
-            priceLine.setData([
-                { time: this.props.data[0].time, value: this.props.data[0].open },
-                { time: this.props.data[this.props.data.length - 1].time, value: this.props.data[0].open}
-            ]);
-        });
+        this.chart.subscribeVisibleTimeRangeChange(this.debounce(event => {
+            if (event) {
+                this.isMoreHistoryNeeded();
+            }
+        }));
 
         window.addEventListener("resize", this.updateChartDimensions.bind(this));
+    }
+
+    debounce(func) { 
+        let debounceTimer 
+        return function() { 
+            const context = this;
+            const args = arguments; 
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(context, args), 500);
+        } 
     }
 
     addChartData(data) {
@@ -44,10 +56,18 @@ class Chart extends Component {
             this.chart.removeSeries(this.candlestickSeries);
             this.lastIndex = 0;
         }
-
+        
         this.candlestickSeries = this.chart.addCandlestickSeries();
         this.candlestickSeries.setData(data);
         this.updateChartDimensions();
+        this.setChartRange();
+    }
+
+    addHistory(data) {
+        // we have to reset the time range after adding the data otherwise the chart resizes itself which is annoying
+        const visRange = this.chart.timeScale().getVisibleRange();
+        this.candlestickSeries.setData(data);
+        this.chart.timeScale().setVisibleRange(visRange);
     }
 
     playChart(data) {
@@ -95,6 +115,25 @@ class Chart extends Component {
         let width = document.getElementById('ChartTarget').offsetWidth;
         this.chart.resize(500, width);
         
+    }
+
+    setChartRange(startTime, endTime) {
+        if (startTime && endTime) {
+            this.chart.timeScale().setVisibleRange({
+                from: startTime,
+                to: endTime
+            });
+        } else {
+            this.chart.timeScale().fitContent()
+        }
+    }
+
+    isMoreHistoryNeeded() {
+        // only sensible way to do this is to reach into the "private" vars
+        if (this.chart.timeScale()._model._timeScale._visibleBars._firstBar < -1) {
+            // get more data
+            this.props.getHistoryData();
+        }
     }
 
     addEntryLine(price) {
@@ -156,6 +195,9 @@ class Chart extends Component {
         if (prevProps.playData !== this.props.playData) {
             this.playChart(this.props.playData);
         }
+        if (prevProps.historyData !== this.props.historyData) {
+            this.addHistory(this.props.data);
+        }
         if (prevProps.entry !== this.props.entry) {
             this.addEntryLine(this.props.entry);
         }
@@ -186,6 +228,7 @@ class Chart extends Component {
 const mapStateToProps = state => ({
     data: state.chartData.data,
     playData: state.tradeData.data,
+    historyData: state.chartData.historyData,
     isRunning: state.tradeData.isRunning,
     entry: state.tradeData.entry,
     stop: state.tradeData.stop,
@@ -193,6 +236,7 @@ const mapStateToProps = state => ({
 });
 const mapDispatchToProps = dispatch => ({
     getData: (symbol, ins, endDate, aggregate) => dispatch(getData(symbol, ins, endDate, aggregate)),
+    getHistoryData: () => dispatch(getHistoryData()),
     pauseTrade: () => dispatch(pauseTrade()),
     startTrade: () => dispatch(startTrade()),
     closeTrade: (entry, price) => dispatch(closeTrade(entry, price)),
