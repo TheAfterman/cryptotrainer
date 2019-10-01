@@ -13,13 +13,15 @@ export default (state = {}, action) => {
                 instrument: action.payload.ins,
                 endDate: action.payload.endDate,
                 aggregate: action.payload.aggregate,
-                loading: true
+                loading: true,
+                firstLoad: true
             };
         case 'GET_DATA_SUCCESS':
             return {
                 ...state,
                 loading: false,
-                data: action.payload.Data
+                data: action.payload.Data,
+                firstLoad: true
             };
         case 'GET_DATA_FAILURE':
             return {
@@ -37,7 +39,8 @@ export default (state = {}, action) => {
                 ...state,
                 loading: false,
                 data: action.payload.Data.concat(state.data),
-                historyData: action.payload.Data
+                historyData: action.payload.Data,
+                firstLoad: false
             };
         case 'GET_ADDITIONAL_HISTORY_REQUEST_FAILURE':
             return {
@@ -45,6 +48,11 @@ export default (state = {}, action) => {
                 loading: false,
                 error: action.payload
             };
+        case 'EXECUTE_TRADE':
+            return {
+                ...state,
+                firstLoad: false
+            }
         default:
             return state
     }

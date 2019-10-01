@@ -51,14 +51,11 @@ class Chart extends Component {
         this.candlestickSeries = this.chart.addCandlestickSeries();
         this.candlestickSeries.setData(data);
         this.updateChartDimensions();
-        this.setChartRange();
+        // this.setChartRange();
     }
 
     addHistory(data) {
-        // we have to reset the time range after adding the data otherwise the chart resizes itself which is annoying
-        const visRange = this.chart.timeScale().getVisibleRange();
         this.candlestickSeries.setData(data);
-        this.chart.timeScale().setVisibleRange(visRange);
     }
 
     playChart(data) {
@@ -180,7 +177,7 @@ class Chart extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.data !== this.props.data) {
+        if (this.props.firstLoad) {
             this.addChartData(this.props.data);
         }
         if (prevProps.playData !== this.props.playData) {
@@ -220,6 +217,7 @@ const mapStateToProps = state => ({
     data: state.chartData.data,
     playData: state.tradeData.data,
     historyData: state.chartData.historyData,
+    firstLoad: state.chartData.firstLoad,
     isRunning: state.tradeData.isRunning,
     entry: state.tradeData.entry,
     stop: state.tradeData.stop,
